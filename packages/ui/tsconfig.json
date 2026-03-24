@@ -1,9 +1,11 @@
 {
-  "extends": "@repo/typescript-config/react-library.json",
+  "extends": "@paikos/typescript-config/react-library.json",
   "compilerOptions": {
-    "outDir": "dist",
-    "strictNullChecks": true
+    "baseUrl": ".",
+    "paths": {
+      "@paikos/ui/*": ["./src/*"]
+    }
   },
-  "include": ["src"],
+  "include": ["."],
   "exclude": ["node_modules", "dist"]
 }

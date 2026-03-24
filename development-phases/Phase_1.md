@@ -1,6 +1,8 @@
-# paikos 
+# paikos
+
 ## Phase 1 — LLM Chat Application
-*Production-Ready Engineering Specification*
+
+_Production-Ready Engineering Specification_
 
 **Version** 1.0.0 | **Status** Phase 1 — Active Build | **Author** Vishal
 
@@ -64,24 +66,24 @@ Phase 1 is a production-ready LLM chat application with streaming responses, ses
 
 ## 1.2 Technology Stack
 
-| Layer | Technology | Reason |
-|---|---|---|
-| **Monorepo** | **Turborepo** | **Task orchestration, remote caching, parallel builds** |
-| **Package Manager** | **pnpm** | **Fast installs, strict hoisting, native workspace support** |
-| Framework | Next.js 15 (App Router) | File-based routing, RSC, built-in edge |
-| API Server | Hono.js on Bun | TypeScript-first, edge-compatible, fast |
-| ORM | Drizzle ORM | Type-safe SQL, zero-runtime overhead |
-| Database | PostgreSQL 16 + pgvector | ACID, relational, future vector support |
-| Auth | Auth.js v5 (NextAuth) | JWTs, OAuth, session abstraction |
-| Cache / Rate-limit | Redis (Upstash or self-hosted) | Atomic counters, ephemeral quotas |
-| LLM | Anthropic Claude 3.5 Sonnet | Streaming, function-calling ready |
-| AI SDK | Vercel AI SDK | useChat hook, SSE streaming |
-| Guest Storage | IndexedDB (Dexie.js) | Structured offline browser storage |
-| State Mgmt | Zustand | Lightweight, no boilerplate |
-| Styling | Tailwind CSS + shadcn/ui | Utility-first, accessible components |
-| Validation | Zod | Runtime schema + TypeScript inference |
-| Testing | Vitest + Playwright | Unit + E2E |
-| Deploy | Vercel (apps/web) + Railway/Fly.io (apps/api) | Zero-config CI/CD, per-app deploy |
+| Layer               | Technology                                    | Reason                                                       |
+| ------------------- | --------------------------------------------- | ------------------------------------------------------------ |
+| **Monorepo**        | **Turborepo**                                 | **Task orchestration, remote caching, parallel builds**      |
+| **Package Manager** | **pnpm**                                      | **Fast installs, strict hoisting, native workspace support** |
+| Framework           | Next.js 15 (App Router)                       | File-based routing, RSC, built-in edge                       |
+| API Server          | Hono.js on Bun                                | TypeScript-first, edge-compatible, fast                      |
+| ORM                 | Drizzle ORM                                   | Type-safe SQL, zero-runtime overhead                         |
+| Database            | PostgreSQL 16 + pgvector                      | ACID, relational, future vector support                      |
+| Auth                | Auth.js v5 (NextAuth)                         | JWTs, OAuth, session abstraction                             |
+| Cache / Rate-limit  | Redis (Upstash or self-hosted)                | Atomic counters, ephemeral quotas                            |
+| LLM                 | Anthropic Claude 3.5 Sonnet                   | Streaming, function-calling ready                            |
+| AI SDK              | Vercel AI SDK                                 | useChat hook, SSE streaming                                  |
+| Guest Storage       | IndexedDB (Dexie.js)                          | Structured offline browser storage                           |
+| State Mgmt          | Zustand                                       | Lightweight, no boilerplate                                  |
+| Styling             | Tailwind CSS + shadcn/ui                      | Utility-first, accessible components                         |
+| Validation          | Zod                                           | Runtime schema + TypeScript inference                        |
+| Testing             | Vitest + Playwright                           | Unit + E2E                                                   |
+| Deploy              | Vercel (apps/web) + Railway/Fly.io (apps/api) | Zero-config CI/CD, per-app deploy                            |
 
 ---
 
@@ -91,21 +93,21 @@ The quota system is the most important business logic in Phase 1. It must be cor
 
 ## 2.1 Definitions
 
-| Term | Definition |
-|---|---|
-| Session | A single conversation thread. One session = one chat topic. A user opens a new session to start a new conversation. |
-| Daily Session Quota | Number of sessions a user can START per UTC day. Separate from message count within a session. |
-| Token Budget | Total input + output tokens consumed across all messages in a session. Tracked for billing/abuse. |
-| Guest | Unauthenticated browser. Identified by a device fingerprint stored in localStorage. |
-| Authenticated User | User with a verified account. Identified by their user_id JWT claim. |
+| Term                | Definition                                                                                                          |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| Session             | A single conversation thread. One session = one chat topic. A user opens a new session to start a new conversation. |
+| Daily Session Quota | Number of sessions a user can START per UTC day. Separate from message count within a session.                      |
+| Token Budget        | Total input + output tokens consumed across all messages in a session. Tracked for billing/abuse.                   |
+| Guest               | Unauthenticated browser. Identified by a device fingerprint stored in localStorage.                                 |
+| Authenticated User  | User with a verified account. Identified by their user_id JWT claim.                                                |
 
 ## 2.2 Quota Tiers
 
-| Tier | Sessions / Day | Token Limit / Session | Message History | Storage |
-|---|---|---|---|---|
-| Guest | 3 | 8,000 tokens | Browser only (IndexedDB) | IndexedDB |
-| Free (Logged In) | 5 (3 + 2 bonus) | 16,000 tokens | Cloud (PostgreSQL) | PostgreSQL |
-| Pro (future) | Unlimited | 100,000 tokens | Cloud (PostgreSQL) | PostgreSQL |
+| Tier             | Sessions / Day  | Token Limit / Session | Message History          | Storage    |
+| ---------------- | --------------- | --------------------- | ------------------------ | ---------- |
+| Guest            | 3               | 8,000 tokens          | Browser only (IndexedDB) | IndexedDB  |
+| Free (Logged In) | 5 (3 + 2 bonus) | 16,000 tokens         | Cloud (PostgreSQL)       | PostgreSQL |
+| Pro (future)     | Unlimited       | 100,000 tokens        | Cloud (PostgreSQL)       | PostgreSQL |
 
 > 🔑 **Key Rule**
 > A "session" is created when the user sends their FIRST message in a new chat. Not when they open the app. This prevents quota exhaustion from abandoned tabs.
@@ -228,50 +230,50 @@ Implemented with Dexie.js. This mirrors the PostgreSQL schema closely so a "merg
 
 ```typescript
 // src/lib/db/guest-db.ts
-import Dexie, { Table } from 'dexie';
+import Dexie, { Table } from "dexie"
 
 export interface GuestSession {
-  id: string;          // nanoid()
-  title: string;
-  model: string;
-  tokenCount: number;
-  isArchived: boolean;
-  createdAt: number;   // Unix ms
-  updatedAt: number;
+  id: string // nanoid()
+  title: string
+  model: string
+  tokenCount: number
+  isArchived: boolean
+  createdAt: number // Unix ms
+  updatedAt: number
 }
 
 export interface GuestMessage {
-  id: string;
-  sessionId: string;
-  role: 'user' | 'assistant';
-  content: string;
-  inputTokens: number;
-  outputTokens: number;
-  createdAt: number;
+  id: string
+  sessionId: string
+  role: "user" | "assistant"
+  content: string
+  inputTokens: number
+  outputTokens: number
+  createdAt: number
 }
 
 export interface GuestDailyUsage {
-  date: string;          // YYYY-MM-DD
-  sessionsStarted: number;
-  totalTokens: number;
+  date: string // YYYY-MM-DD
+  sessionsStarted: number
+  totalTokens: number
 }
 
 export class GuestDatabase extends Dexie {
-  sessions!: Table<GuestSession>;
-  messages!: Table<GuestMessage>;
-  dailyUsage!: Table<GuestDailyUsage>;
+  sessions!: Table<GuestSession>
+  messages!: Table<GuestMessage>
+  dailyUsage!: Table<GuestDailyUsage>
 
   constructor() {
-    super('paikos__guest');
+    super("paikos__guest")
     this.version(1).stores({
-      sessions: 'id, createdAt, isArchived',
-      messages: 'id, sessionId, createdAt',
-      dailyUsage: 'date',
-    });
+      sessions: "id, createdAt, isArchived",
+      messages: "id, sessionId, createdAt",
+      dailyUsage: "date",
+    })
   }
 }
 
-export const guestDb = new GuestDatabase();
+export const guestDb = new GuestDatabase()
 ```
 
 ---
@@ -282,21 +284,21 @@ JWT-based auth with short-lived access tokens (15 min) and long-lived refresh to
 
 ## 4.1 Token Strategy
 
-| Token | Storage | TTL | Purpose |
-|---|---|---|---|
-| Access JWT | Memory (Zustand) | 15 minutes | Authorize API requests |
-| Refresh Token | HttpOnly Cookie | 30 days | Silently refresh access token |
-| Device Fingerprint | localStorage | Permanent | Guest quota enforcement |
+| Token              | Storage          | TTL        | Purpose                       |
+| ------------------ | ---------------- | ---------- | ----------------------------- |
+| Access JWT         | Memory (Zustand) | 15 minutes | Authorize API requests        |
+| Refresh Token      | HttpOnly Cookie  | 30 days    | Silently refresh access token |
+| Device Fingerprint | localStorage     | Permanent  | Guest quota enforcement       |
 
 ## 4.2 JWT Payload
 
 ```typescript
 interface JWTPayload {
-  sub: string;        // user_id (UUID)
-  email: string;
-  plan: "free" | "pro";
-  iat: number;        // issued at
-  exp: number;        // expiry
+  sub: string // user_id (UUID)
+  email: string
+  plan: "free" | "pro"
+  iat: number // issued at
+  exp: number // expiry
 }
 ```
 
@@ -305,13 +307,13 @@ interface JWTPayload {
 ```typescript
 // src/lib/guest-identity.ts
 export function getDeviceFingerprint(): string {
-  const KEY = 'paikos_device_id';
-  let id = localStorage.getItem(KEY);
+  const KEY = "paikos_device_id"
+  let id = localStorage.getItem(KEY)
   if (!id) {
-    id = crypto.randomUUID();
-    localStorage.setItem(KEY, id);
+    id = crypto.randomUUID()
+    localStorage.setItem(KEY, id)
   }
-  return id;
+  return id
 }
 ```
 
@@ -323,15 +325,15 @@ All endpoints live under the base path `/api/v1`. The API server is Hono.js runn
 
 ## 5.0 Global Standards
 
-| Convention | Value |
-|---|---|
-| Base URL | `https://api.paikos.app/api/v1` |
-| Auth Header | `Authorization: Bearer <access_token>` |
-| Content-Type | `application/json` |
-| Date Format | ISO 8601 — `2024-12-01T10:30:00Z` |
-| ID Format | UUID v4 |
-| Error Shape | `{ error: string, code: string, details?: object }` |
-| Pagination | cursor-based: `{ data, nextCursor, hasMore }` |
+| Convention   | Value                                               |
+| ------------ | --------------------------------------------------- |
+| Base URL     | `https://api.paikos.app/api/v1`                     |
+| Auth Header  | `Authorization: Bearer <access_token>`              |
+| Content-Type | `application/json`                                  |
+| Date Format  | ISO 8601 — `2024-12-01T10:30:00Z`                   |
+| ID Format    | UUID v4                                             |
+| Error Shape  | `{ error: string, code: string, details?: object }` |
+| Pagination   | cursor-based: `{ data, nextCursor, hasMore }`       |
 
 ## 5.1 Standard Error Response
 
@@ -353,20 +355,20 @@ interface ErrorResponse {
 
 ## 5.2 HTTP Status Code Reference
 
-| Code | Meaning | When Used |
-|---|---|---|
-| `200 OK` | Success | GET, PATCH, DELETE that returns data |
-| `201 Created` | Resource created | POST that creates a new resource |
-| `204 No Content` | Success, no body | DELETE with no return data |
-| `400 Bad Request` | Invalid input | Zod validation failure, malformed JSON |
-| `401 Unauthorized` | Not authenticated | Missing/invalid/expired access token |
-| `403 Forbidden` | Authenticated but no permission | Accessing another user's session |
-| `404 Not Found` | Resource does not exist | Session ID, message ID not found |
-| `409 Conflict` | State conflict | Email already registered |
-| `422 Unprocessable` | Semantic validation error | Token limit exceeded mid-stream |
-| `429 Too Many Requests` | Rate limit / quota exceeded | Daily session quota hit |
-| `500 Internal Server Error` | Unexpected server error | Uncaught exception |
-| `503 Service Unavailable` | Upstream down | Claude API unavailable |
+| Code                        | Meaning                         | When Used                              |
+| --------------------------- | ------------------------------- | -------------------------------------- |
+| `200 OK`                    | Success                         | GET, PATCH, DELETE that returns data   |
+| `201 Created`               | Resource created                | POST that creates a new resource       |
+| `204 No Content`            | Success, no body                | DELETE with no return data             |
+| `400 Bad Request`           | Invalid input                   | Zod validation failure, malformed JSON |
+| `401 Unauthorized`          | Not authenticated               | Missing/invalid/expired access token   |
+| `403 Forbidden`             | Authenticated but no permission | Accessing another user's session       |
+| `404 Not Found`             | Resource does not exist         | Session ID, message ID not found       |
+| `409 Conflict`              | State conflict                  | Email already registered               |
+| `422 Unprocessable`         | Semantic validation error       | Token limit exceeded mid-stream        |
+| `429 Too Many Requests`     | Rate limit / quota exceeded     | Daily session quota hit                |
+| `500 Internal Server Error` | Unexpected server error         | Uncaught exception                     |
+| `503 Service Unavailable`   | Upstream down                   | Claude API unavailable                 |
 
 ---
 
@@ -386,11 +388,11 @@ interface ErrorResponse {
 
 #### Responses
 
-| Code | Body | When |
-|---|---|---|
-| `201 Created` | `{ user: UserDTO, accessToken: string }` | Account created successfully |
+| Code              | Body                                                      | When                           |
+| ----------------- | --------------------------------------------------------- | ------------------------------ |
+| `201 Created`     | `{ user: UserDTO, accessToken: string }`                  | Account created successfully   |
 | `400 Bad Request` | `{ error, code: "VALIDATION_ERROR", details: ZodErrors }` | Invalid email or weak password |
-| `409 Conflict` | `{ error, code: "EMAIL_TAKEN" }` | Email already registered |
+| `409 Conflict`    | `{ error, code: "EMAIL_TAKEN" }`                          | Email already registered       |
 
 #### Response Body (201)
 
@@ -423,10 +425,10 @@ interface ErrorResponse {
 
 #### Responses
 
-| Code | Body | When |
-|---|---|---|
-| `200 OK` | `{ user: UserDTO, accessToken: string }` | Login successful |
-| `400 Bad Request` | `{ error, code: "VALIDATION_ERROR" }` | Missing fields |
+| Code               | Body                                     | When                    |
+| ------------------ | ---------------------------------------- | ----------------------- |
+| `200 OK`           | `{ user: UserDTO, accessToken: string }` | Login successful        |
+| `400 Bad Request`  | `{ error, code: "VALIDATION_ERROR" }`    | Missing fields          |
 | `401 Unauthorized` | `{ error, code: "INVALID_CREDENTIALS" }` | Wrong email or password |
 
 ---
@@ -437,9 +439,9 @@ No request body needed. Reads the `paikos_refresh` HttpOnly cookie automatically
 
 #### Responses
 
-| Code | Body | When |
-|---|---|---|
-| `200 OK` | `{ accessToken: string }` | New access token issued |
+| Code               | Body                                       | When                                |
+| ------------------ | ------------------------------------------ | ----------------------------------- |
+| `200 OK`           | `{ accessToken: string }`                  | New access token issued             |
 | `401 Unauthorized` | `{ error, code: "REFRESH_TOKEN_INVALID" }` | Cookie missing, expired, or revoked |
 
 ---
@@ -454,9 +456,9 @@ Authorization: Bearer <access_token>    // optional but recommended
 
 #### Responses
 
-| Code | Body | When |
-|---|---|---|
-| `204 No Content` | *(empty)* | Logged out. Cookie cleared. Token revoked. |
+| Code             | Body      | When                                       |
+| ---------------- | --------- | ------------------------------------------ |
+| `204 No Content` | _(empty)_ | Logged out. Cookie cleared. Token revoked. |
 
 ---
 
@@ -470,20 +472,20 @@ Authorization: Bearer <access_token>    // required
 
 #### Responses
 
-| Code | Body | When |
-|---|---|---|
-| `200 OK` | `{ user: UserDTO }` | Token valid |
+| Code               | Body                               | When                 |
+| ------------------ | ---------------------------------- | -------------------- |
+| `200 OK`           | `{ user: UserDTO }`                | Token valid          |
 | `401 Unauthorized` | `{ error, code: "TOKEN_EXPIRED" }` | Access token expired |
 
 #### UserDTO
 
 ```typescript
 interface UserDTO {
-  id: string;
-  email: string;
-  name: string | null;
-  plan: "free" | "pro";
-  createdAt: string;
+  id: string
+  email: string
+  name: string | null
+  plan: "free" | "pro"
+  createdAt: string
 }
 ```
 
@@ -507,9 +509,9 @@ X-Device-ID: <device_fingerprint>    // required for guests
 
 #### Responses
 
-| Code | Body | When |
-|---|---|---|
-| `200 OK` | `QuotaDTO` | Always returns status |
+| Code              | Body                                   | When                                     |
+| ----------------- | -------------------------------------- | ---------------------------------------- |
+| `200 OK`          | `QuotaDTO`                             | Always returns status                    |
 | `400 Bad Request` | `{ error, code: "MISSING_DEVICE_ID" }` | Guest request without X-Device-ID header |
 
 #### QuotaDTO
@@ -557,13 +559,13 @@ interface QuotaDTO {
 
 #### Responses
 
-| Code | Body | When |
-|---|---|---|
-| `201 Created` | `SessionDTO` | Session created, quota incremented |
-| `400 Bad Request` | `{ error, code: "VALIDATION_ERROR" }` | Invalid model or title too long |
-| `400 Bad Request` | `{ error, code: "MISSING_DEVICE_ID" }` | Guest without device ID header |
-| `401 Unauthorized` | `{ error, code: "TOKEN_EXPIRED" }` | Expired access token |
-| `429 Too Many Requests` | `QuotaExhaustedError` | Daily session limit reached |
+| Code                    | Body                                   | When                               |
+| ----------------------- | -------------------------------------- | ---------------------------------- |
+| `201 Created`           | `SessionDTO`                           | Session created, quota incremented |
+| `400 Bad Request`       | `{ error, code: "VALIDATION_ERROR" }`  | Invalid model or title too long    |
+| `400 Bad Request`       | `{ error, code: "MISSING_DEVICE_ID" }` | Guest without device ID header     |
+| `401 Unauthorized`      | `{ error, code: "TOKEN_EXPIRED" }`     | Expired access token               |
+| `429 Too Many Requests` | `QuotaExhaustedError`                  | Daily session limit reached        |
 
 #### QuotaExhaustedError (429 body)
 
@@ -585,14 +587,14 @@ interface QuotaDTO {
 
 ```typescript
 interface SessionDTO {
-  id: string;
-  title: string;
-  model: string;
-  tokenCount: number;
-  isArchived: boolean;
-  messageCount: number;
-  createdAt: string;
-  updatedAt: string;
+  id: string
+  title: string
+  model: string
+  tokenCount: number
+  isArchived: boolean
+  messageCount: number
+  createdAt: string
+  updatedAt: string
 }
 ```
 
@@ -604,12 +606,12 @@ interface SessionDTO {
 
 #### Query Params
 
-| Param | Type | Default | Description |
-|---|---|---|---|
-| `limit` | integer | 20 | Max 50 |
-| `cursor` | string | null | Pagination cursor (session ID) |
-| `archived` | boolean | false | Include archived sessions |
-| `search` | string | null | Full-text search on title |
+| Param      | Type    | Default | Description                    |
+| ---------- | ------- | ------- | ------------------------------ |
+| `limit`    | integer | 20      | Max 50                         |
+| `cursor`   | string  | null    | Pagination cursor (session ID) |
+| `archived` | boolean | false   | Include archived sessions      |
+| `search`   | string  | null    | Full-text search on title      |
 
 #### Response (200)
 
@@ -629,12 +631,12 @@ interface SessionDTO {
 
 #### Responses
 
-| Code | Body | When |
-|---|---|---|
-| `200 OK` | `SessionDTO & { messages: MessageDTO[] }` | Found and authorized |
-| `401 Unauthorized` | `{ error, code: "TOKEN_EXPIRED" }` | Not authenticated |
-| `403 Forbidden` | `{ error, code: "SESSION_ACCESS_DENIED" }` | Session belongs to different user |
-| `404 Not Found` | `{ error, code: "SESSION_NOT_FOUND" }` | Session does not exist |
+| Code               | Body                                       | When                              |
+| ------------------ | ------------------------------------------ | --------------------------------- |
+| `200 OK`           | `SessionDTO & { messages: MessageDTO[] }`  | Found and authorized              |
+| `401 Unauthorized` | `{ error, code: "TOKEN_EXPIRED" }`         | Not authenticated                 |
+| `403 Forbidden`    | `{ error, code: "SESSION_ACCESS_DENIED" }` | Session belongs to different user |
+| `404 Not Found`    | `{ error, code: "SESSION_NOT_FOUND" }`     | Session does not exist            |
 
 ---
 
@@ -653,12 +655,12 @@ interface SessionDTO {
 
 #### Responses
 
-| Code | Body | When |
-|---|---|---|
-| `200 OK` | `SessionDTO` | Updated |
-| `400 Bad Request` | `{ error, code: "VALIDATION_ERROR" }` | Invalid body |
-| `403 Forbidden` | `{ error, code: "SESSION_ACCESS_DENIED" }` | Not your session |
-| `404 Not Found` | `{ error, code: "SESSION_NOT_FOUND" }` | Session does not exist |
+| Code              | Body                                       | When                   |
+| ----------------- | ------------------------------------------ | ---------------------- |
+| `200 OK`          | `SessionDTO`                               | Updated                |
+| `400 Bad Request` | `{ error, code: "VALIDATION_ERROR" }`      | Invalid body           |
+| `403 Forbidden`   | `{ error, code: "SESSION_ACCESS_DENIED" }` | Not your session       |
+| `404 Not Found`   | `{ error, code: "SESSION_NOT_FOUND" }`     | Session does not exist |
 
 ---
 
@@ -668,11 +670,11 @@ interface SessionDTO {
 
 #### Responses
 
-| Code | Body | When |
-|---|---|---|
-| `204 No Content` | *(empty)* | Deleted |
-| `403 Forbidden` | `{ error, code: "SESSION_ACCESS_DENIED" }` | Not your session |
-| `404 Not Found` | `{ error, code: "SESSION_NOT_FOUND" }` | Session does not exist |
+| Code             | Body                                       | When                   |
+| ---------------- | ------------------------------------------ | ---------------------- |
+| `204 No Content` | _(empty)_                                  | Deleted                |
+| `403 Forbidden`  | `{ error, code: "SESSION_ACCESS_DENIED" }` | Not your session       |
+| `404 Not Found`  | `{ error, code: "SESSION_NOT_FOUND" }`     | Session does not exist |
 
 ---
 
@@ -724,84 +726,94 @@ data: {"type":"error","error":{"code":"TOKEN_LIMIT_EXCEEDED","message":"Session 
 
 ```typescript
 // app/(chat)/page.tsx
-import { useChat } from 'ai/react';
+import { useChat } from "ai/react"
 
-const { messages, input, handleInputChange, handleSubmit, isLoading, error } = useChat({
-  api: `/api/v1/sessions/${sessionId}/messages`,
-  headers: {
-    Authorization: `Bearer ${accessToken}`,
-    'X-Device-ID': getDeviceFingerprint(),
-  },
-  onFinish(message) {
-    // update token count in local state
-  },
-  onError(error) {
-    if (error.message.includes('QUOTA_EXHAUSTED')) {
-      showUpgradeModal();
-    }
-  },
-});
+const { messages, input, handleInputChange, handleSubmit, isLoading, error } =
+  useChat({
+    api: `/api/v1/sessions/${sessionId}/messages`,
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "X-Device-ID": getDeviceFingerprint(),
+    },
+    onFinish(message) {
+      // update token count in local state
+    },
+    onError(error) {
+      if (error.message.includes("QUOTA_EXHAUSTED")) {
+        showUpgradeModal()
+      }
+    },
+  })
 ```
 
 #### Non-Streaming Error Responses
 
-| Code | Body | When |
-|---|---|---|
-| `400 Bad Request` | `{ error, code: "VALIDATION_ERROR" }` | Empty content, missing body |
-| `401 Unauthorized` | `{ error, code: "TOKEN_EXPIRED" }` | Expired access token |
-| `403 Forbidden` | `{ error, code: "SESSION_ACCESS_DENIED" }` | Not your session |
-| `404 Not Found` | `{ error, code: "SESSION_NOT_FOUND" }` | Session does not exist |
-| `422 Unprocessable` | `{ error, code: "TOKEN_LIMIT_EXCEEDED" }` | Session over token budget |
-| `429 Too Many Requests` | `QuotaExhaustedError` | Message rate limit (60/min/user) |
-| `503 Service Unavailable` | `{ error, code: "LLM_UNAVAILABLE" }` | Claude API down or overloaded |
+| Code                      | Body                                       | When                             |
+| ------------------------- | ------------------------------------------ | -------------------------------- |
+| `400 Bad Request`         | `{ error, code: "VALIDATION_ERROR" }`      | Empty content, missing body      |
+| `401 Unauthorized`        | `{ error, code: "TOKEN_EXPIRED" }`         | Expired access token             |
+| `403 Forbidden`           | `{ error, code: "SESSION_ACCESS_DENIED" }` | Not your session                 |
+| `404 Not Found`           | `{ error, code: "SESSION_NOT_FOUND" }`     | Session does not exist           |
+| `422 Unprocessable`       | `{ error, code: "TOKEN_LIMIT_EXCEEDED" }`  | Session over token budget        |
+| `429 Too Many Requests`   | `QuotaExhaustedError`                      | Message rate limit (60/min/user) |
+| `503 Service Unavailable` | `{ error, code: "LLM_UNAVAILABLE" }`       | Claude API down or overloaded    |
 
 #### Backend Implementation Sketch
 
 ```typescript
 // api/routes/messages.ts  (Hono)
-app.post('/sessions/:sessionId/messages', async (c) => {
-  const { sessionId } = c.req.param();
-  const identity = await resolveIdentity(c);
-  const session = await sessionService.getAndAuthorize(sessionId, identity);
+app.post("/sessions/:sessionId/messages", async (c) => {
+  const { sessionId } = c.req.param()
+  const identity = await resolveIdentity(c)
+  const session = await sessionService.getAndAuthorize(sessionId, identity)
 
   if (session.tokenCount >= TOKEN_LIMIT[identity.tier]) {
-    return c.json({ error: 'Token limit exceeded', code: 'TOKEN_LIMIT_EXCEEDED' }, 422);
+    return c.json(
+      { error: "Token limit exceeded", code: "TOKEN_LIMIT_EXCEEDED" },
+      422
+    )
   }
 
-  const { content } = await c.req.json();
-  const history = await messageService.getHistory(sessionId);
+  const { content } = await c.req.json()
+  const history = await messageService.getHistory(sessionId)
 
-  await messageService.create({ sessionId, role: 'user', content });
+  await messageService.create({ sessionId, role: "user", content })
 
   const claudeStream = anthropic.messages.stream({
     model: session.model,
     max_tokens: 4096,
-    messages: [...history, { role: 'user', content }],
-  });
+    messages: [...history, { role: "user", content }],
+  })
 
-  c.header('Content-Type', 'text/event-stream');
-  c.header('Cache-Control', 'no-cache');
-  c.header('Connection', 'keep-alive');
+  c.header("Content-Type", "text/event-stream")
+  c.header("Cache-Control", "no-cache")
+  c.header("Connection", "keep-alive")
 
   return stream(c, async (sseStream) => {
-    let fullText = '';
+    let fullText = ""
     for await (const event of claudeStream) {
-      if (event.type === 'content_block_delta') {
-        fullText += event.delta.text;
-        await sseStream.writeSSE({ data: JSON.stringify(event) });
+      if (event.type === "content_block_delta") {
+        fullText += event.delta.text
+        await sseStream.writeSSE({ data: JSON.stringify(event) })
       }
-      if (event.type === 'message_stop') {
-        const usage = claudeStream.finalUsage();
+      if (event.type === "message_stop") {
+        const usage = claudeStream.finalUsage()
         await messageService.create({
-          sessionId, role: 'assistant', content: fullText,
-          inputTokens: usage.input_tokens, outputTokens: usage.output_tokens
-        });
-        await sessionService.updateTokenCount(sessionId, usage.input_tokens + usage.output_tokens);
-        await sseStream.writeSSE({ data: JSON.stringify(event) });
+          sessionId,
+          role: "assistant",
+          content: fullText,
+          inputTokens: usage.input_tokens,
+          outputTokens: usage.output_tokens,
+        })
+        await sessionService.updateTokenCount(
+          sessionId,
+          usage.input_tokens + usage.output_tokens
+        )
+        await sseStream.writeSSE({ data: JSON.stringify(event) })
       }
     }
-  });
-});
+  })
+})
 ```
 
 ---
@@ -814,11 +826,11 @@ app.post('/sessions/:sessionId/messages', async (c) => {
 
 #### Query Params
 
-| Param | Type | Default | Description |
-|---|---|---|---|
-| `limit` | integer | 50 | Max 100 per page |
-| `cursor` | string | null | Cursor pagination (message ID) |
-| `direction` | string | `asc` | `asc` (oldest first) or `desc` (newest first) |
+| Param       | Type    | Default | Description                                   |
+| ----------- | ------- | ------- | --------------------------------------------- |
+| `limit`     | integer | 50      | Max 100 per page                              |
+| `cursor`    | string  | null    | Cursor pagination (message ID)                |
+| `direction` | string  | `asc`   | `asc` (oldest first) or `desc` (newest first) |
 
 #### Response (200)
 
@@ -860,11 +872,11 @@ app.post('/sessions/:sessionId/messages', async (c) => {
 
 #### Responses
 
-| Code | Body | When |
-|---|---|---|
-| `204 No Content` | *(empty)* | Deleted |
-| `403 Forbidden` | `{ error, code: "ACCESS_DENIED" }` | Not your message |
-| `404 Not Found` | `{ error, code: "MESSAGE_NOT_FOUND" }` | Message does not exist |
+| Code             | Body                                   | When                   |
+| ---------------- | -------------------------------------- | ---------------------- |
+| `204 No Content` | _(empty)_                              | Deleted                |
+| `403 Forbidden`  | `{ error, code: "ACCESS_DENIED" }`     | Not your message       |
+| `404 Not Found`  | `{ error, code: "MESSAGE_NOT_FOUND" }` | Message does not exist |
 
 ---
 
@@ -926,26 +938,26 @@ When a guest user logs in or registers after using the app, we should offer to m
 ```typescript
 interface MigrateRequest {
   sessions: {
-    id: string;
-    title: string;
-    model: string;
-    createdAt: number;
+    id: string
+    title: string
+    model: string
+    createdAt: number
     messages: {
-      role: "user" | "assistant";
-      content: string;
-      createdAt: number;
-    }[];
-  }[];
+      role: "user" | "assistant"
+      content: string
+      createdAt: number
+    }[]
+  }[]
 }
 ```
 
 #### Responses
 
-| Code | Body | When |
-|---|---|---|
-| `200 OK` | `{ migratedCount: number, sessionIds: string[] }` | Migration successful |
-| `400 Bad Request` | `{ error, code: "VALIDATION_ERROR" }` | Malformed payload |
-| `422 Unprocessable` | `{ error, code: "MIGRATION_TOO_LARGE" }` | More than 50 sessions in payload |
+| Code                | Body                                              | When                             |
+| ------------------- | ------------------------------------------------- | -------------------------------- |
+| `200 OK`            | `{ migratedCount: number, sessionIds: string[] }` | Migration successful             |
+| `400 Bad Request`   | `{ error, code: "VALIDATION_ERROR" }`             | Malformed payload                |
+| `422 Unprocessable` | `{ error, code: "MIGRATION_TOO_LARGE" }`          | More than 50 sessions in payload |
 
 ---
 
@@ -1137,94 +1149,100 @@ packages:
 
 ```typescript
 // In apps/api/src/routes/sessions.ts
-import { db } from '@paikos/db';
-import { sessions, messages } from '@paikos/db/schema';
-import type { SessionDTO, CreateSessionRequest } from '@paikos/types';
+import { db } from "@paikos/db"
+import { sessions, messages } from "@paikos/db/schema"
+import type { SessionDTO, CreateSessionRequest } from "@paikos/types"
 
 // In apps/web/src/lib/api/sessions.ts
-import type { SessionDTO, QuotaDTO } from '@paikos/types';
+import type { SessionDTO, QuotaDTO } from "@paikos/types"
 ```
 
 ## 7.6 Auth Store (Zustand) — `apps/web`
 
 ```typescript
 // apps/web/src/lib/stores/auth.store.ts
-import { create } from 'zustand';
-import type { UserDTO } from '@paikos/types';
+import { create } from "zustand"
+import type { UserDTO } from "@paikos/types"
 
 interface AuthState {
-  user: UserDTO | null;
-  accessToken: string | null;
-  isLoading: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  logout: () => Promise<void>;
-  refreshToken: () => Promise<void>;
-  setUser: (user: UserDTO, token: string) => void;
+  user: UserDTO | null
+  accessToken: string | null
+  isLoading: boolean
+  login: (email: string, password: string) => Promise<void>
+  logout: () => Promise<void>
+  refreshToken: () => Promise<void>
+  setUser: (user: UserDTO, token: string) => void
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
   accessToken: null,
   isLoading: true,
-  login: async (email, password) => { /* ... */ },
-  logout: async () => { /* ... */ },
-  refreshToken: async () => { /* ... */ },
+  login: async (email, password) => {
+    /* ... */
+  },
+  logout: async () => {
+    /* ... */
+  },
+  refreshToken: async () => {
+    /* ... */
+  },
   setUser: (user, token) => set({ user, accessToken: token, isLoading: false }),
-}));
+}))
 ```
 
 ## 7.7 Silent Token Refresh (Axios Interceptor) — `apps/web`
 
 ```typescript
 // apps/web/src/lib/api/client.ts
-import axios from 'axios';
-import { useAuthStore } from '../stores/auth.store';
+import axios from "axios"
+import { useAuthStore } from "../stores/auth.store"
 
 export const apiClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL + '/api/v1',
-  withCredentials: true,   // sends HttpOnly cookie automatically
-});
+  baseURL: process.env.NEXT_PUBLIC_API_URL + "/api/v1",
+  withCredentials: true, // sends HttpOnly cookie automatically
+})
 
 apiClient.interceptors.request.use((config) => {
-  const token = useAuthStore.getState().accessToken;
-  if (token) config.headers.Authorization = `Bearer ${token}`;
-  return config;
-});
+  const token = useAuthStore.getState().accessToken
+  if (token) config.headers.Authorization = `Bearer ${token}`
+  return config
+})
 
-let isRefreshing = false;
-let failedQueue: Array<{ resolve: Function; reject: Function }> = [];
+let isRefreshing = false
+let failedQueue: Array<{ resolve: Function; reject: Function }> = []
 
 apiClient.interceptors.response.use(null, async (error) => {
-  const original = error.config;
+  const original = error.config
   if (error.response?.status === 401 && !original._retry) {
     if (isRefreshing) {
       return new Promise((resolve, reject) => {
-        failedQueue.push({ resolve, reject });
-      }).then(token => {
-        original.headers.Authorization = `Bearer ${token}`;
-        return apiClient(original);
-      });
+        failedQueue.push({ resolve, reject })
+      }).then((token) => {
+        original.headers.Authorization = `Bearer ${token}`
+        return apiClient(original)
+      })
     }
-    original._retry = true;
-    isRefreshing = true;
+    original._retry = true
+    isRefreshing = true
     try {
-      await useAuthStore.getState().refreshToken();
-      const newToken = useAuthStore.getState().accessToken;
-      failedQueue.forEach(p => p.resolve(newToken));
-      failedQueue = [];
-      original.headers.Authorization = `Bearer ${newToken}`;
-      return apiClient(original);
+      await useAuthStore.getState().refreshToken()
+      const newToken = useAuthStore.getState().accessToken
+      failedQueue.forEach((p) => p.resolve(newToken))
+      failedQueue = []
+      original.headers.Authorization = `Bearer ${newToken}`
+      return apiClient(original)
     } catch (e) {
-      failedQueue.forEach(p => p.reject(e));
-      failedQueue = [];
-      useAuthStore.getState().logout();
-      throw e;
+      failedQueue.forEach((p) => p.reject(e))
+      failedQueue = []
+      useAuthStore.getState().logout()
+      throw e
     } finally {
-      isRefreshing = false;
+      isRefreshing = false
     }
   }
-  throw error;
-});
+  throw error
+})
 ```
 
 ---
@@ -1233,13 +1251,13 @@ apiClient.interceptors.response.use(null, async (error) => {
 
 ## 8.1 Limits
 
-| Rule | Limit | Key | Implementation |
-|---|---|---|---|
-| Session creation | 3/day guest, 5/day free | `device_id` or `user_id` + date | Redis INCR + EXPIREAT midnight |
-| Message send | 60/min per identity | `user_id` or `device_id` | Redis sliding window |
-| Auth (login/register) | 10/min per IP | `ip_address` | Redis fixed window |
-| Token refresh | 5/min per IP | `ip_address` | Redis fixed window |
-| Health check | 120/min per IP | `ip_address` | Redis fixed window |
+| Rule                  | Limit                   | Key                             | Implementation                 |
+| --------------------- | ----------------------- | ------------------------------- | ------------------------------ |
+| Session creation      | 3/day guest, 5/day free | `device_id` or `user_id` + date | Redis INCR + EXPIREAT midnight |
+| Message send          | 60/min per identity     | `user_id` or `device_id`        | Redis sliding window           |
+| Auth (login/register) | 10/min per IP           | `ip_address`                    | Redis fixed window             |
+| Token refresh         | 5/min per IP            | `ip_address`                    | Redis fixed window             |
+| Health check          | 120/min per IP          | `ip_address`                    | Redis fixed window             |
 
 ## 8.2 Redis Key Conventions
 
@@ -1335,86 +1353,105 @@ export class AppError extends Error {
     public readonly statusCode: number,
     public readonly details?: unknown
   ) {
-    super(message);
+    super(message)
   }
 }
 
 export const Errors = {
   VALIDATION: (details: unknown) =>
-    new AppError('VALIDATION_ERROR', 'Invalid request data', 400, details),
+    new AppError("VALIDATION_ERROR", "Invalid request data", 400, details),
   UNAUTHORIZED: () =>
-    new AppError('UNAUTHORIZED', 'Authentication required', 401),
-  FORBIDDEN: () =>
-    new AppError('SESSION_ACCESS_DENIED', 'Access denied', 403),
+    new AppError("UNAUTHORIZED", "Authentication required", 401),
+  FORBIDDEN: () => new AppError("SESSION_ACCESS_DENIED", "Access denied", 403),
   NOT_FOUND: (resource: string) =>
-    new AppError(`${resource.toUpperCase()}_NOT_FOUND`, `${resource} not found`, 404),
+    new AppError(
+      `${resource.toUpperCase()}_NOT_FOUND`,
+      `${resource} not found`,
+      404
+    ),
   QUOTA_EXHAUSTED: (details: object) =>
-    new AppError('QUOTA_EXHAUSTED', 'Daily session limit reached', 429, details),
+    new AppError(
+      "QUOTA_EXHAUSTED",
+      "Daily session limit reached",
+      429,
+      details
+    ),
   LLM_ERROR: () =>
-    new AppError('LLM_UNAVAILABLE', 'AI service unavailable', 503),
-};
+    new AppError("LLM_UNAVAILABLE", "AI service unavailable", 503),
+}
 
 // Global error handler middleware (Hono)
 app.onError((err, c) => {
-  const requestId = c.get('requestId');
+  const requestId = c.get("requestId")
   if (err instanceof AppError) {
-    return c.json({ error: err.message, code: err.code, details: err.details, requestId }, err.statusCode);
+    return c.json(
+      { error: err.message, code: err.code, details: err.details, requestId },
+      err.statusCode
+    )
   }
-  logger.error({ err, requestId }, 'Unhandled error');
-  return c.json({ error: 'Internal server error', code: 'INTERNAL_ERROR', requestId }, 500);
-});
+  logger.error({ err, requestId }, "Unhandled error")
+  return c.json(
+    { error: "Internal server error", code: "INTERNAL_ERROR", requestId },
+    500
+  )
+})
 ```
 
 ## 10.2 Request Validation (Zod)
 
 ```typescript
-import { z } from 'zod';
+import { z } from "zod"
 
 export const CreateSessionSchema = z.object({
-  title: z.string().max(200).optional().default('New Chat'),
-  model: z.enum(['claude-3-5-sonnet-20241022']).optional()
-           .default('claude-3-5-sonnet-20241022'),
-});
+  title: z.string().max(200).optional().default("New Chat"),
+  model: z
+    .enum(["claude-3-5-sonnet-20241022"])
+    .optional()
+    .default("claude-3-5-sonnet-20241022"),
+})
 
 export const SendMessageSchema = z.object({
-  content: z.string().min(1, 'Message cannot be empty').max(8000),
-  model: z.enum(['claude-3-5-sonnet-20241022']).optional(),
-});
+  content: z.string().min(1, "Message cannot be empty").max(8000),
+  model: z.enum(["claude-3-5-sonnet-20241022"]).optional(),
+})
 
 // In route handler:
-const parsed = SendMessageSchema.safeParse(await c.req.json());
-if (!parsed.success) throw Errors.VALIDATION(parsed.error.flatten());
+const parsed = SendMessageSchema.safeParse(await c.req.json())
+if (!parsed.success) throw Errors.VALIDATION(parsed.error.flatten())
 ```
 
 ## 10.3 Logging Standard
 
 ```typescript
 app.use(async (c, next) => {
-  const requestId = `req_${nanoid(12)}`;
-  c.set('requestId', requestId);
-  c.header('X-Request-ID', requestId);
-  const start = Date.now();
-  await next();
+  const requestId = `req_${nanoid(12)}`
+  c.set("requestId", requestId)
+  c.header("X-Request-ID", requestId)
+  const start = Date.now()
+  await next()
   logger.info({
     requestId,
     method: c.req.method,
     path: c.req.path,
     status: c.res.status,
     durationMs: Date.now() - start,
-  });
-});
+  })
+})
 ```
 
 ## 10.4 CORS Configuration
 
 ```typescript
-app.use('/*', cors({
-  origin: process.env.ALLOWED_ORIGINS!.split(','),
-  allowHeaders: ['Content-Type', 'Authorization', 'X-Device-ID'],
-  allowMethods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
-  credentials: true,  // required for HttpOnly cookies
-  maxAge: 86400,
-}));
+app.use(
+  "/*",
+  cors({
+    origin: process.env.ALLOWED_ORIGINS!.split(","),
+    allowHeaders: ["Content-Type", "Authorization", "X-Device-ID"],
+    allowMethods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+    credentials: true, // required for HttpOnly cookies
+    maxAge: 86400,
+  })
+)
 ```
 
 ---
@@ -1457,14 +1494,14 @@ app.use('/*', cors({
 
 # 12. Phase Roadmap
 
-| Phase | Scope | Status |
-|---|---|---|
-| Phase 1 — Chat Core | SSE streaming chat, auth, session management, quota system, dual storage | ✅ Current |
-| Phase 2 — Memory | Episodic memory with Redis (short-term) + pgvector (episodes) + Neo4j (knowledge graph) | 🔜 Next |
-| Phase 3 — MCP Sources | Ingest PDFs, URLs, Notion pages via MCP servers into the knowledge graph | 📋 Planned |
-| Phase 4 — Voice | Real-time voice I/O: Groq Whisper STT, Kokoro-js TTS, sub-300ms latency pipeline | 📋 Planned |
-| Phase 5 — D3 Graph UI | Interactive knowledge graph visualization, node exploration, research timeline | 📋 Planned |
+| Phase                 | Scope                                                                                   | Status     |
+| --------------------- | --------------------------------------------------------------------------------------- | ---------- |
+| Phase 1 — Chat Core   | SSE streaming chat, auth, session management, quota system, dual storage                | ✅ Current |
+| Phase 2 — Memory      | Episodic memory with Redis (short-term) + pgvector (episodes) + Neo4j (knowledge graph) | 🔜 Next    |
+| Phase 3 — MCP Sources | Ingest PDFs, URLs, Notion pages via MCP servers into the knowledge graph                | 📋 Planned |
+| Phase 4 — Voice       | Real-time voice I/O: Groq Whisper STT, Kokoro-js TTS, sub-300ms latency pipeline        | 📋 Planned |
+| Phase 5 — D3 Graph UI | Interactive knowledge graph visualization, node exploration, research timeline          | 📋 Planned |
 
 ---
 
-*paikos  — Phase 1 Engineering Spec v1.0.0 | Built by Vishal*
+_paikos — Phase 1 Engineering Spec v1.0.0 | Built by Vishal_

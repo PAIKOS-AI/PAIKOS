@@ -227,24 +227,24 @@ pnpm test:e2e --ui      # UI mode
 describe("createSession", () => {
   it("should create session if quota available", async () => {
     // Arrange
-    const userId = "test-user";
+    const userId = "test-user"
 
     // Act
-    const session = await createSession(userId);
+    const session = await createSession(userId)
 
     // Assert
-    expect(session).toBeDefined();
-    expect(session.userId).toBe(userId);
-  });
+    expect(session).toBeDefined()
+    expect(session.userId).toBe(userId)
+  })
 
   it("should reject if quota exceeded", async () => {
     // Arrange
-    const userId = "quota-exceeded";
+    const userId = "quota-exceeded"
 
     // Act & Assert
-    await expect(createSession(userId)).rejects.toThrow("QUOTA_EXCEEDED");
-  });
-});
+    await expect(createSession(userId)).rejects.toThrow("QUOTA_EXCEEDED")
+  })
+})
 ```
 
 ---
