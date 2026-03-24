@@ -1,4 +1,3 @@
 {
-  "extends": "@paikos/typescript-config/base.json"
+  "extends": "./packages/typescript-config/base.json"
 }
-
