@@ -1,16 +1,16 @@
-import { NextResponse } from "next/server";
+import { NextResponse } from "next/server"
 
 type NimModel = {
-  id: string;
-  name?: string;
-  owned_by?: string;
-};
+  id: string
+  name?: string
+  owned_by?: string
+}
 
 const formatProviderName = (provider: string) =>
   provider
     .split("-")
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(" ");
+    .join(" ")
 
 export async function GET() {
   try {
@@ -19,19 +19,19 @@ export async function GET() {
       headers: {
         Authorization: `Bearer ${process.env.NVIDIA_NIM_API_KEY}`,
       },
-    });
+    })
 
     if (!response.ok) {
-      return NextResponse.json({ models: [] }, { status: response.status });
+      return NextResponse.json({ models: [] }, { status: response.status })
     }
 
-    const data = (await response.json()) as { data?: NimModel[] };
+    const data = (await response.json()) as { data?: NimModel[] }
 
-    const seen = new Set<string>();
+    const seen = new Set<string>()
     const models = (data.data ?? [])
       .map((model) => {
-        const provider = model.owned_by ?? "nvidia";
-        const chefSlug = provider.toLowerCase().replace(/\s+/g, "-");
+        const provider = model.owned_by ?? "nvidia"
+        const chefSlug = provider.toLowerCase().replace(/\s+/g, "-")
 
         return {
           chef: formatProviderName(chefSlug),
@@ -39,16 +39,16 @@ export async function GET() {
           id: model.id,
           name: model.name || model.id,
           providers: [chefSlug],
-        };
+        }
       })
       .filter((model) => {
-        if (seen.has(model.id)) return false;
-        seen.add(model.id);
-        return true;
-      });
+        if (seen.has(model.id)) return false
+        seen.add(model.id)
+        return true
+      })
 
-    return NextResponse.json({ models });
+    return NextResponse.json({ models })
   } catch {
-    return NextResponse.json({ models: [] }, { status: 500 });
+    return NextResponse.json({ models: [] }, { status: 500 })
   }
 }

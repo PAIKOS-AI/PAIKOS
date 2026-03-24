@@ -1,29 +1,29 @@
-"use client";
+"use client"
 
-import { useCallback, useEffect, useState, memo, Fragment } from "react";
-import { useChat } from "@ai-sdk/react";
-import { Button } from "@paikos/ui/components/button";
-import { cn } from "@paikos/ui/lib/utils";
+import { useCallback, useEffect, useState, memo, Fragment } from "react"
+import { useChat } from "@ai-sdk/react"
+import { Button } from "@paikos/ui/components/button"
+import { cn } from "@paikos/ui/lib/utils"
 import {
   ArrowUpIcon,
   CheckIcon,
   CopyIcon,
   RefreshCcwIcon,
   SparklesIcon,
-} from "lucide-react";
+} from "lucide-react"
 import {
   Conversation,
   ConversationContent,
   ConversationEmptyState,
   ConversationScrollButton,
-} from "@/components/ai-elements/conversation";
+} from "@/components/ai-elements/conversation"
 import {
   Message,
   MessageAction,
   MessageActions,
   MessageContent,
   MessageResponse,
-} from "@/components/ai-elements/message";
+} from "@/components/ai-elements/message"
 import {
   ModelSelector,
   ModelSelectorContent,
@@ -36,27 +36,27 @@ import {
   ModelSelectorLogoGroup,
   ModelSelectorName,
   ModelSelectorTrigger,
-} from "@/components/ai-elements/model-selector";
+} from "@/components/ai-elements/model-selector"
 import {
   PromptInput,
   PromptInputFooter,
   type PromptInputMessage,
   PromptInputSubmit,
   PromptInputTextarea,
-} from "@/components/ai-elements/prompt-input";
+} from "@/components/ai-elements/prompt-input"
 
 type UIModel = {
-  chef: string;
-  chefSlug: string;
-  id: string;
-  name: string;
-  providers: string[];
-};
+  chef: string
+  chefSlug: string
+  id: string
+  name: string
+  providers: string[]
+}
 
 interface ModelItemProps {
-  model: UIModel;
-  selectedModel: string;
-  onSelect: (id: string) => void;
+  model: UIModel
+  selectedModel: string
+  onSelect: (id: string) => void
 }
 
 const starterPrompts = [
@@ -64,13 +64,13 @@ const starterPrompts = [
   "Explain how the graph and memory layers work together",
   "Summarize the API surface and main routes",
   "Suggest a cleanup plan for the current architecture",
-];
+]
 
 const ModelItem = memo(({ model, selectedModel, onSelect }: ModelItemProps) => {
   const handleSelect = useCallback(
     () => onSelect(model.id),
     [onSelect, model.id]
-  );
+  )
 
   return (
     <ModelSelectorItem onSelect={handleSelect} value={model.id}>
@@ -87,97 +87,97 @@ const ModelItem = memo(({ model, selectedModel, onSelect }: ModelItemProps) => {
         <div className="ml-auto size-4" />
       )}
     </ModelSelectorItem>
-  );
-});
+  )
+})
 
-ModelItem.displayName = "ModelItem";
+ModelItem.displayName = "ModelItem"
 
 const ChatPage = () => {
-  const [input, setInput] = useState("");
-  const [open, setOpen] = useState(false);
-  const [selectedModel, setSelectedModel] = useState("");
-  const [availableModels, setAvailableModels] = useState<UIModel[]>([]);
-  const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
-  const { messages, sendMessage, status, regenerate, stop } = useChat();
+  const [input, setInput] = useState("")
+  const [open, setOpen] = useState(false)
+  const [selectedModel, setSelectedModel] = useState("")
+  const [availableModels, setAvailableModels] = useState<UIModel[]>([])
+  const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null)
+  const { messages, sendMessage, status, regenerate, stop } = useChat()
 
   useEffect(() => {
-    let active = true;
+    let active = true
 
     const loadModels = async () => {
       try {
-        const response = await fetch("/api/models", { cache: "no-store" });
+        const response = await fetch("/api/models", { cache: "no-store" })
 
-        if (!response.ok) return;
+        if (!response.ok) return
 
-        const data = (await response.json()) as { models?: UIModel[] };
+        const data = (await response.json()) as { models?: UIModel[] }
 
         if (active && data.models?.length) {
-          const nextModels = data.models;
-          setAvailableModels(nextModels);
+          const nextModels = data.models
+          setAvailableModels(nextModels)
           setSelectedModel((current) =>
             current && nextModels.some((m) => m.id === current)
               ? current
-              : nextModels[0]?.id ?? ""
-          );
+              : (nextModels[0]?.id ?? "")
+          )
         }
       } catch {
         // Keep the selector empty when the catalog request fails.
       }
-    };
+    }
 
-    loadModels();
+    loadModels()
 
     return () => {
-      active = false;
-    };
-  }, []);
+      active = false
+    }
+  }, [])
 
   const handleSubmit = useCallback(
     (message: PromptInputMessage) => {
-      const text = message.text.trim();
-      if (!text) return;
+      const text = message.text.trim()
+      if (!text) return
       sendMessage(
         { text },
         selectedModel ? { body: { model: selectedModel } } : undefined
-      );
-      setInput("");
+      )
+      setInput("")
     },
     [selectedModel, sendMessage]
-  );
+  )
 
   const handleModelSelect = useCallback((id: string) => {
-    setSelectedModel(id);
-    setOpen(false);
-  }, []);
+    setSelectedModel(id)
+    setOpen(false)
+  }, [])
 
   const handleStarterPrompt = useCallback((prompt: string) => {
-    setInput(prompt);
-  }, []);
+    setInput(prompt)
+  }, [])
 
   const handleCopy = useCallback(async (messageId: string, text: string) => {
     try {
-      await navigator.clipboard.writeText(text);
-      setCopiedMessageId(messageId);
+      await navigator.clipboard.writeText(text)
+      setCopiedMessageId(messageId)
       window.setTimeout(() => {
         setCopiedMessageId((current) =>
           current === messageId ? null : current
-        );
-      }, 1600);
+        )
+      }, 1600)
     } catch {
       // Ignore clipboard failures.
     }
-  }, []);
+  }, [])
 
   const selectedModelData = availableModels.find(
     (model) => model.id === selectedModel
-  );
-  const chefs = [...new Set(availableModels.map((model) => model.chef))];
+  )
+  const chefs = [...new Set(availableModels.map((model) => model.chef))]
 
-  const isStreaming = status === "submitted" || status === "streaming";
+  const isStreaming = status === "submitted" || status === "streaming"
   const promptStatus =
     status === "submitted" || status === "streaming" || status === "error"
       ? status
-      : "ready";
+      : "ready"
 
   return (
     <div className="flex h-[100dvh] flex-col overflow-hidden bg-background">
@@ -188,9 +188,7 @@ const ChatPage = () => {
             PAIKOS
           </span>
           <span className="text-border">·</span>
-          <span className="text-[12px] text-muted-foreground">
-            Action Demo
-          </span>
+          <span className="text-[12px] text-muted-foreground">Action Demo</span>
         </div>
 
         <div className="flex items-center gap-3">
@@ -206,7 +204,7 @@ const ChatPage = () => {
                     : "bg-emerald-500"
               )}
             />
-            <span className="hidden text-[11px] tabular-nums text-muted-foreground sm:block">
+            <span className="hidden text-[11px] text-muted-foreground tabular-nums sm:block">
               {isStreaming
                 ? status === "submitted"
                   ? "Sending…"
@@ -299,18 +297,18 @@ const ChatPage = () => {
                     (lastIndex, part, partIndex) =>
                       part.type === "text" ? partIndex : lastIndex,
                     -1
-                  );
+                  )
 
                   return (
                     <Fragment key={message.id}>
                       {message.parts.map((part, partIndex) => {
-                        if (part.type !== "text") return null;
+                        if (part.type !== "text") return null
 
-                        const actionId = `${message.id}-${partIndex}`;
+                        const actionId = `${message.id}-${partIndex}`
                         const isLatestAssistantText =
                           message.role === "assistant" &&
                           messageIndex === messages.length - 1 &&
-                          partIndex === lastTextPartIndex;
+                          partIndex === lastTextPartIndex
 
                         return (
                           <Fragment key={actionId}>
@@ -358,10 +356,10 @@ const ChatPage = () => {
                               </MessageActions>
                             )}
                           </Fragment>
-                        );
+                        )
                       })}
                     </Fragment>
-                  );
+                  )
                 })}
               </div>
             )}
@@ -370,7 +368,7 @@ const ChatPage = () => {
         </Conversation>
 
         {/* ── Composer ── always pinned at bottom */}
-        <div className="flex-none px-4 pb-4 pt-2 sm:px-6 sm:pb-5">
+        <div className="flex-none px-4 pt-2 pb-4 sm:px-6 sm:pb-5">
           <div className="mx-auto w-full max-w-4xl space-y-2">
             <PromptInput
               className="rounded-2xl border bg-background shadow-sm"
@@ -403,7 +401,7 @@ const ChatPage = () => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default ChatPage;
+export default ChatPage

@@ -11,10 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@paikos/ui/components/dialog"
-import {
-  InputGroup,
-  InputGroupAddon,
-} from "@paikos/ui/components/input-group"
+import { InputGroup, InputGroupAddon } from "@paikos/ui/components/input-group"
 import { SearchIcon, CheckIcon } from "lucide-react"
 
 function Command({

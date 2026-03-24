@@ -1,1 +1,1 @@
-export { default } from "@paikos/ui/postcss.config";
+export { default } from "@paikos/ui/postcss.config"

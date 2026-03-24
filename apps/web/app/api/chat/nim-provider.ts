@@ -1,4 +1,4 @@
-import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
+import { createOpenAICompatible } from "@ai-sdk/openai-compatible"
 
 export const nim = createOpenAICompatible({
   name: "nim",
@@ -7,4 +7,4 @@ export const nim = createOpenAICompatible({
   headers: {
     Authorization: `Bearer ${process.env.NVIDIA_NIM_API_KEY}`,
   },
-});
+})
