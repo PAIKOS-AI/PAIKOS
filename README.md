@@ -1,159 +1,237 @@
-# Turborepo starter
+# PAIKOS — LLM Chat Application
 
-This Turborepo starter is maintained by the Turborepo core team.
+> A production-ready Phase 1 implementation of an AI chat interface with Claude, streaming responses, session management, and tiered quotas.
 
-## Using this example
+# PAIKOS — LLM Chat Application
 
-Run the following command:
+> A production-ready Phase 1 implementation of an AI chat interface with Claude, streaming responses, session management, and tiered quotas.
 
-```sh
-npx create-turbo@latest
+## 🚀 Quick Start
+
+```bash
+# Install dependencies
+pnpm install
+
+# Setup environment
+cp apps/web/.env.example apps/web/.env
+cp apps/api/.env.example apps/api/.env
+
+# Create database
+cd apps/api && pnpm db:push
+
+# Start dev servers
+pnpm dev
 ```
 
-## What's inside?
+**URLs:**
 
-This Turborepo includes the following packages/apps:
+- Frontend: http://localhost:3000
+- API: http://localhost:3001
+- API Docs: http://localhost:3001/docs
 
-### Apps and Packages
+---
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+## 📋 What's Included
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+### Phase 1 Features ✅
 
-### Utilities
+- Email & OAuth authentication (Google, GitHub)
+- Guest mode with local storage
+- Session management (create, list, archive)
+- Real-time streaming chat with Claude 3.5 Sonnet
+- Token quota system:
+  - **Guest:** 3 sessions/day, 8K tokens per session
+  - **Free:** 5 sessions/day, 16K tokens per session
+- Message history (PostgreSQL for users, IndexedDB for guests)
+- Mobile-responsive UI
 
-This Turborepo has some additional tools already setup for you:
+### Not in Phase 1
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+- Voice (Phase 2)
+- Graph visualization (Phase 2)
+- Memory/context (Phase 2)
+- Payment system (Phase 3)
 
-### Build
+---
 
-To build all apps and packages, run the following command:
+## 🏗️ Architecture
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo build
+```
+Next.js Frontend (3000)
+    ↓ SSE / REST
+Hono API Server (3001)
+    ↓ SQL
+PostgreSQL + IndexedDB
+    ↓
+Anthropic Claude API
 ```
 
-Without global `turbo`, use your package manager:
+### Tech Stack
 
-```sh
-cd my-turborepo
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
+| Layer         | Tech                 | Reason                        |
+| ------------- | -------------------- | ----------------------------- |
+| Frontend      | Next.js 15, React 19 | App Router, streaming support |
+| API           | Hono.js on Bun       | Lightweight, TypeScript-first |
+| Database      | PostgreSQL + Drizzle | Type-safe ORM                 |
+| Guest Storage | IndexedDB (Dexie.js) | Browser-side persistence      |
+| State         | Zustand              | Lightweight, performant       |
+| Auth          | Auth.js v5           | JWT + OAuth support           |
+| LLM           | Anthropic Claude     | Best quality, streaming       |
+| Streaming     | Vercel AI SDK        | useChat hook                  |
+| UI            | Tailwind + shadcn/ui | Beautiful, accessible         |
+
+---
+
+## 📁 Project Structure
+
+```
+paikos/
+├── apps/
+│   ├── web/                  # Next.js frontend
+│   │   ├── src/app/         # Routes
+│   │   ├── src/components/  # React components
+│   │   ├── src/lib/         # Utilities
+│   │   └── .env.example
+│   │
+│   └── api/                  # Hono API server
+│       ├── src/routes/      # API endpoints
+│       ├── src/services/    # Business logic
+│       ├── src/db/          # Drizzle schema
+│       └── .env.example
+│
+├── packages/
+│   ├── db/                   # Shared schema
+│   └── shared-types/         # TypeScript types
+│
+├── ENGINEERING_GUIDELINES.md # Dev standards
+├── CONTRIBUTING.md           # How to contribute
+├── README.md                 # This file
+└── .github/
+    ├── ISSUE_TEMPLATE/
+    └── pull_request_template.md
 ```
 
-You can build a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+---
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
+## 🔑 Key Concepts
 
-```sh
-turbo build --filter=docs
+### Sessions & Quotas
+
+A **session** is created when a user sends their FIRST message in a new chat (not when opening the app). This prevents quota games.
+
+```
+User opens app
+    ↓
+User types message
+    ↓
+[Check daily quota]
+    ↓
+Create session in DB
+    ↓
+Stream chat response
+    ↓
+Track tokens consumed
 ```
 
-Without global `turbo`:
+### Authentication
 
-```sh
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
+- **Access Token** — 15 min expiry, memory storage
+- **Refresh Token** — 30 days, HttpOnly cookie
+- **Guest ID** — Device fingerprint in localStorage
+
+### Database
+
+- **Authenticated users** → PostgreSQL (persistent)
+- **Guests** → IndexedDB (browser-local)
+
+---
+
+## 🛠️ Development
+
+### Common Commands
+
+```bash
+pnpm dev              # Start all services
+pnpm build            # Production build
+pnpm lint             # Check code
+pnpm lint:fix         # Fix issues
+pnpm format           # Format code
+pnpm test             # Run tests
+pnpm test:e2e         # E2E tests
 ```
 
-### Develop
+### Database
 
-To develop all apps and packages, run the following command:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo dev
+```bash
+cd apps/api
+pnpm db:push          # Create/update schema
+pnpm db:studio        # Open Drizzle Studio
+pnpm db:seed          # Seed test data
 ```
 
-Without global `turbo`, use your package manager:
+### Debugging
 
-```sh
-cd my-turborepo
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
+```bash
+# API server
+cd apps/api && pnpm dev
+
+# Frontend
+cd apps/web && pnpm dev
+
+# Check API responses
+curl -H "Authorization: Bearer <token>" http://localhost:3001/api/v1/sessions
 ```
 
-You can develop a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+---
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
+## 📚 Documentation
 
-```sh
-turbo dev --filter=web
-```
+- **[ENGINEERING_GUIDELINES.md](./ENGINEERING_GUIDELINES.md)** — Development standards, branching, commits
+- **[CONTRIBUTING.md](./CONTRIBUTING.md)** — How to contribute
+- **[CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md)** — Community guidelines
+- **[SECURITY.md](./SECURITY.md)** — Security policies
+- **[Phase 1 Spec](./development-phases/Phase_1.md)** — Complete API specification
 
-Without global `turbo`:
+---
 
-```sh
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-```
+## ✨ Before You Start
 
-### Remote Caching
+1. **Read** [ENGINEERING_GUIDELINES.md](./ENGINEERING_GUIDELINES.md)
+2. **Setup** environment files (`.env`)
+3. **Run** `pnpm install && pnpm dev`
+4. **Check** http://localhost:3000 for the UI
+5. **Make** a feature branch: `git checkout -b feature/description`
 
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
+---
 
-Turborepo can use a technique known as [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
+## 🤝 Contributing
 
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for:
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
+- How to report bugs
+- How to request features
+- Pull request process
+- Code review guidelines
 
-```sh
-cd my-turborepo
-turbo login
-```
+---
 
-Without global `turbo`, use your package manager:
+## 🔐 Security
 
-```sh
-cd my-turborepo
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
-```
+See [SECURITY.md](./SECURITY.md) for:
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
+- Environment variable management
+- Token handling
+- API rate limiting
+- Quota enforcement
 
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
+---
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
+## 📞 Support
 
-```sh
-turbo link
-```
+- **Questions** → Open a GitHub issue
+- **Bug report** → Use issue template
+- **Security** → See SECURITY.md
 
-Without global `turbo`:
+---
 
-```sh
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.dev/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.dev/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.dev/docs/reference/configuration)
-- [CLI Usage](https://turborepo.dev/docs/reference/command-line-reference)
+**Phase:** 1 (Active Build) | **Updated:** March 2026 | **Status:** Production-Ready Template
