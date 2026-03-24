@@ -31,6 +31,7 @@ jobs:
 
   lint:
     name: lint
+    needs: branch-policy
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -53,6 +54,7 @@ jobs:
 
   check-types:
     name: check-types
+    needs: lint
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -75,6 +77,7 @@ jobs:
 
   test:
     name: test
+    needs: check-types
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
