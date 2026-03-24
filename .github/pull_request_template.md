@@ -26,5 +26,7 @@
 - [ ] Code follows guidelines
 - [ ] Tests pass (`pnpm test`)
 - [ ] Linting passes (`pnpm lint`)
+- [ ] Type checks pass (`pnpm check-types`)
+- [ ] Except hotfixes, no direct commits to `main`; changes go through `dev` first.
 - [ ] No console.logs left
 - [ ] Documentation updated (if needed)
