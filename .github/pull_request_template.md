@@ -26,5 +26,6 @@
 - [ ] Code follows guidelines
 - [ ] Tests pass (`pnpm test`)
 - [ ] Linting passes (`pnpm lint`)
+- [ ] Type checks pass (`pnpm check-types`)
 - [ ] No console.logs left
 - [ ] Documentation updated (if needed)
