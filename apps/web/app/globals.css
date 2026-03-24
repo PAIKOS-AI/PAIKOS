@@ -1,1 +1,10 @@
-@import "tailwindcss";
+@import "@paikos/ui/globals.css";
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  font-family: var(--font-geist-sans), sans-serif;
+}
