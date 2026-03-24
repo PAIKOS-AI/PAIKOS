@@ -27,6 +27,7 @@ export async function GET() {
 
     const data = (await response.json()) as { data?: NimModel[] };
 
+    const seen = new Set<string>();
     const models = (data.data ?? [])
       .map((model) => {
         const provider = model.owned_by ?? "nvidia";
@@ -39,6 +40,11 @@ export async function GET() {
           name: model.name || model.id,
           providers: [chefSlug],
         };
+      })
+      .filter((model) => {
+        if (seen.has(model.id)) return false;
+        seen.add(model.id);
+        return true;
       });
 
     return NextResponse.json({ models });
