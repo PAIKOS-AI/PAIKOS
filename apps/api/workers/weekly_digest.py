@@ -1,1 +1,0 @@
-"""Scheduled weekly digest task."""

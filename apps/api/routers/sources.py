@@ -1,1 +1,0 @@
-"""CRUD /api/sources endpoints."""
