@@ -1,7 +1,14 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "ui": "tui",
-  "globalEnv": ["NVIDIA_NIM_API_KEY", "NVIDIA_NIM_BASE_URL"],
+  "globalEnv": [
+    "NVIDIA_NIM_API_KEY",
+    "NVIDIA_NIM_BASE_URL",
+    "NODE_ENV",
+    "PORT",
+    "RATE_LIMIT_WINDOW_MS",
+    "RATE_LIMIT_MAX"
+  ],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],

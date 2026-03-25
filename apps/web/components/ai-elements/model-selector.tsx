@@ -1,3 +1,4 @@
+import Image from "next/image"
 import {
   Command,
   CommandDialog,
@@ -109,7 +110,7 @@ export const ModelSelectorSeparator = (props: ModelSelectorSeparatorProps) => (
 )
 
 export type ModelSelectorLogoProps = Omit<
-  ComponentProps<"img">,
+  ComponentProps<typeof Image>,
   "src" | "alt"
 > & {
   provider:
@@ -178,13 +179,13 @@ export const ModelSelectorLogo = ({
   className,
   ...props
 }: ModelSelectorLogoProps) => (
-  // eslint-disable-next-line @next/next/no-img-element -- tiny external SVG provider badges are rendered as-is.
-  <img
+  <Image
     {...props}
     alt={`${provider} logo`}
     className={cn("size-3 dark:invert", className)}
     height={12}
     src={`https://models.dev/logos/${provider}.svg`}
+    unoptimized
     width={12}
   />
 )
@@ -197,7 +198,7 @@ export const ModelSelectorLogoGroup = ({
 }: ModelSelectorLogoGroupProps) => (
   <div
     className={cn(
-      "flex shrink-0 items-center -space-x-1 [&>img]:rounded-full [&>img]:bg-background [&>img]:p-px [&>img]:ring-1 dark:[&>img]:bg-foreground",
+      "flex shrink-0 items-center -space-x-1 [&_img]:rounded-full [&_img]:bg-background [&_img]:p-px [&_img]:ring-1 dark:[&_img]:bg-foreground",
       className
     )}
     {...props}
