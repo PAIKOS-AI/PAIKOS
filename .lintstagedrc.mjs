@@ -1,6 +1,9 @@
 export default {
-  "*.{ts,tsx,js,jsx}": ["pnpm exec eslint --fix", "pnpm exec prettier --check"],
-  "*.{json,json5}": ["pnpm exec prettier --check"],
-  "*.{css,scss}": ["pnpm exec prettier --check"],
-  "*.md": ["pnpm exec prettier --check"],
+  "*.{ts,tsx,js,jsx}": [
+    "pnpm exec eslint --fix",
+    "node scripts/prettier-check-soft.mjs",
+  ],
+  "*.{json,json5}": ["node scripts/prettier-check-soft.mjs"],
+  "*.{css,scss}": ["node scripts/prettier-check-soft.mjs"],
+  "*.md": ["node scripts/prettier-check-soft.mjs"],
 }

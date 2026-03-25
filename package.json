@@ -4,10 +4,12 @@
   "type": "module",
   "scripts": {
     "prepare": "husky",
+    "checks": "pnpm lint && pnpm check-types && pnpm test && pnpm format:check",
     "build": "turbo run build",
     "dev": "turbo run dev",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,js,mjs,cjs,jsx,json,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,mjs,cjs,jsx,json,md}\"",
     "check-types": "turbo run check-types",
     "test": "pnpm -r --if-present test"
   },
