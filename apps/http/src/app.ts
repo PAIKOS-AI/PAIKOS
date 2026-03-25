@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import pinoHttp from "pino-http";
+import { hrtime } from "node:process";
 import { healthRouter } from "./routes/health.js";
 import { errorHandler } from "./middleware/error-handler.js";
 import { globalLimiter } from "./middleware/rate-limit.js";
@@ -16,7 +17,27 @@ app.use(helmet());
 app.use(cors());
 app.use(express.json());
 app.use(globalLimiter);
-app.use(pinoHttp({ logger }));
+app.use(
+  pinoHttp({
+    logger,
+    autoLogging: false,
+    quietReqLogger: true,
+  })
+);
+app.use((req, res, next) => {
+  const start = hrtime.bigint();
+
+  res.on("finish", () => {
+    const durationMs = Number(hrtime.bigint() - start) / 1_000_000;
+    const roundedDurationMs = Math.round(durationMs * 100) / 100;
+
+    logger.info(
+      `${req.method} ${req.originalUrl} ${res.statusCode} ${roundedDurationMs}ms`
+    );
+  });
+
+  next();
+});
 
 // Routes
 app.get("/", (_req, res) => {

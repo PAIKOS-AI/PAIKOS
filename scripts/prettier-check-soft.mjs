@@ -7,7 +7,10 @@ const result = spawnSync("pnpm", ["exec", "prettier", "--check", ...files], {
 })
 
 if (result.error) {
-  console.warn("[prettier-soft-check] Unable to run Prettier check:", result.error.message)
+  console.warn(
+    "[prettier-soft-check] Unable to run Prettier check:",
+    result.error.message
+  )
 }
 
 process.exit(0)
